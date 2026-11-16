@@ -1,0 +1,389 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Choose your pump",
+        "description": "Pumps Home Assistant can hear over Bluetooth (directly or through an ESPHome Bluetooth proxy).",
+        "data": {
+          "address": "Pump"
+        }
+      },
+      "confirm": {
+        "title": "Add {name}?",
+        "description": "Home Assistant will connect to the pump itself at {address} (signal {rssi} dBm).\n\nThe pump takes one Bluetooth connection at a time: close the Mobius app first, and remove any other integration that connects to this pump."
+      }
+    },
+    "abort": {
+      "already_configured": "This pump is already set up.",
+      "no_devices_found": "No EcoTech Mobius pump is being heard over Bluetooth. Check the pump is powered, the Mobius app is closed and a Bluetooth proxy is near the tank.",
+      "no_serial": "The pump's advertisement didn't include its serial number. Turn on active scanning on the Bluetooth proxy and try again.",
+      "cannot_connect": "Couldn't connect to the pump to read its serial number. Close the Mobius app, make sure no other integration is connected to the pump, and try again.",
+      "not_supported": "This isn't an EcoTech Mobius device."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Pump settings",
+        "data": {
+          "poll_interval": "Read the pump every",
+          "keep_connected": "Keep the Bluetooth connection open",
+          "off_hold_minutes": "Pump switch off: back on by itself after",
+          "app_release_minutes": "'Hand over to Mobius app' lasts",
+          "tank_volume": "Tank volume (for the turnover reading, 0 = off)",
+          "time_sync": "Keep the pump's clock and time zone right",
+          "firmware_check": "Check EcoTech for new firmware"
+        },
+        "data_description": {
+          "keep_connected": "Faster controls. Turn off to connect only for each reading, which leaves gaps for the Mobius app.",
+          "off_hold_minutes": "A safety net so the pump can't be left off. Most is 1092 minutes (just over 18 hours).",
+          "time_sync": "Schedules run on the pump's own clock. Checked every 6 hours and corrected if it is out by more than 30 seconds."
+        }
+      }
+    }
+  },
+  "entity": {
+    "switch": {
+      "pump": {
+        "name": "Pump"
+      },
+      "local_control": {
+        "name": "Buttons on driver"
+      }
+    },
+    "number": {
+      "speed": {
+        "name": "Speed"
+      },
+      "feed_time": {
+        "name": "Feed time"
+      },
+      "battery_backup_speed": {
+        "name": "Battery backup speed"
+      }
+    },
+    "select": {
+      "wave_mode": {
+        "name": "Wave mode",
+        "state": {
+          "constantspeed": "Constant speed",
+          "lagoon": "Lagoon",
+          "reefcrest": "ReefCrest",
+          "nutrienttransport": "Nutrient transport",
+          "tidalswell": "Tidal swell",
+          "shortpulse": "Short pulse",
+          "gyre": "Gyre",
+          "transition": "Transition",
+          "expandingpulse": "Expanding pulse",
+          "sync": "Sync",
+          "ecosmartback": "EcoSmart back",
+          "feed": "Feed",
+          "batterybackup": "Battery backup",
+          "random": "Random",
+          "pulse": "Pulse",
+          "undefined": "Not set"
+        }
+      },
+      "scene": {
+        "name": "Scene"
+      },
+      "led_auto_dim": {
+        "name": "Status light dims after",
+        "state": {
+          "always_on": "Never (always on)",
+          "30_seconds": "30 seconds",
+          "1_minute": "1 minute",
+          "5_minutes": "5 minutes",
+          "10_minutes": "10 minutes",
+          "30_minutes": "30 minutes",
+          "1_hour": "1 hour"
+        }
+      }
+    },
+    "button": {
+      "feed": {
+        "name": "Feed"
+      },
+      "resume_schedule": {
+        "name": "Back to schedule"
+      },
+      "release_for_app": {
+        "name": "Hand over to Mobius app"
+      },
+      "reconnect": {
+        "name": "Reconnect now"
+      },
+      "sync_time": {
+        "name": "Set pump clock"
+      }
+    },
+    "sensor": {
+      "motor_speed": {
+        "name": "Motor speed"
+      },
+      "flow": {
+        "name": "Flow"
+      },
+      "motor_power": {
+        "name": "Motor power"
+      },
+      "turnover": {
+        "name": "Tank turnover"
+      },
+      "operation_mode": {
+        "name": "Running mode",
+        "state": {
+          "oob": "Out of box",
+          "basic": "Basic",
+          "schedule": "Schedule",
+          "demo": "Demo",
+          "usbpower": "USB power",
+          "discodemo": "Disco demo",
+          "constantspeed": "Constant speed",
+          "lagoon": "Lagoon",
+          "reefcrest": "ReefCrest",
+          "shortpulsespeedset": "Short pulse speed set",
+          "shortpulsetimeset": "Short pulse time set",
+          "syncslave": "Sync (follower)",
+          "antisyncslave": "Anti-sync (follower)",
+          "batterybackup": "Battery backup",
+          "feedmode": "Feed mode",
+          "setup": "Setup",
+          "usboverride": "USB override",
+          "oobmode": "Out of box mode",
+          "presetshortpulse": "Preset short pulse",
+          "tidalswell": "Tidal swell",
+          "nutrienttransport": "Nutrient transport",
+          "ecobackslave": "EcoSmart back (follower)",
+          "gyrespeedset": "Gyre speed set",
+          "gyretimeset": "Gyre time set",
+          "presetgyre": "Preset gyre",
+          "motoroff": "Motor off",
+          "autotunewave": "Auto tune wave",
+          "finetunewave": "Fine tune wave",
+          "configuration": "Configuration",
+          "rffrequencyconfig": "RF frequency setup",
+          "transition": "Transition",
+          "expandingpulse": "Expanding pulse",
+          "delayedpower": "Delayed power",
+          "vectracalibration": "Vectra calibration",
+          "identify": "Identify",
+          "error": "Error"
+        }
+      },
+      "operation_state": {
+        "name": "Control",
+        "state": {
+          "oob": "Out of box",
+          "livedemo": "Live demo",
+          "scene": "Scene",
+          "schedule": "Schedule"
+        }
+      },
+      "active_scene": {
+        "name": "Active scene"
+      },
+      "scene_time_left": {
+        "name": "Scene time left"
+      },
+      "error": {
+        "name": "Fault",
+        "state": {
+          "noerror": "No fault",
+          "disconnect": "Disconnect",
+          "temperature": "Temperature",
+          "stall": "Stall",
+          "thermistor": "Thermistor",
+          "undervoltage": "Under voltage",
+          "powersupply": "Power supply",
+          "scheduleplayback": "Schedule playback",
+          "overvoltage": "Over voltage",
+          "overcurrent": "Over current",
+          "lockdetectioncurrentlimit": "Lock detection current limit",
+          "abnormalspeed": "Abnormal speed",
+          "abnormalkt": "Abnormal motor constant",
+          "stuckinopenloop": "Stuck in open loop",
+          "stuckinclosedloop": "Stuck in closed loop",
+          "fanfault": "Fan fault",
+          "drivertemp": "Driver temperature",
+          "ledchannelshortcircuit": "LED channel short circuit",
+          "ledchannelcurrentleak": "LED channel current leak",
+          "ledchannelopencircuit": "LED channel open circuit",
+          "ledclusterthermistor": "LED cluster thermistor",
+          "ledclusterovertemp": "LED cluster over temperature",
+          "devicebricked": "Device bricked",
+          "rtc": "Clock fault",
+          "motorpowerdip": "Motor power dip",
+          "motorshort": "Motor short",
+          "wireless": "Wireless",
+          "appupgrade": "App upgrade",
+          "clogerror": "Clogged",
+          "dryrun": "Running dry",
+          "ptctrip": "PTC fuse tripped"
+        }
+      },
+      "run_time": {
+        "name": "Running time"
+      },
+      "off_time": {
+        "name": "Paused time"
+      },
+      "energy": {
+        "name": "Energy"
+      },
+      "water_moved": {
+        "name": "Water moved"
+      },
+      "feeds": {
+        "name": "Feeds"
+      },
+      "last_feed": {
+        "name": "Last feed"
+      },
+      "signal_strength": {
+        "name": "Signal strength"
+      },
+      "bluetooth_link": {
+        "name": "Bluetooth link",
+        "state": {
+          "connected": "Connected",
+          "on_demand": "Connects for each reading",
+          "released": "Handed to Mobius app",
+          "disconnected": "Disconnected"
+        }
+      },
+      "last_reading": {
+        "name": "Last reading"
+      },
+      "clock_drift": {
+        "name": "Pump clock difference"
+      },
+      "rated_max_flow": {
+        "name": "Rated maximum flow"
+      },
+      "firmware": {
+        "name": "Firmware"
+      },
+      "pump_readings": {
+        "name": "Other pump readings"
+      },
+      "driver_temperature": {
+        "name": "Driver temperature"
+      },
+      "motor_temperature": {
+        "name": "Motor temperature"
+      },
+      "motor_rpm": {
+        "name": "Motor RPM"
+      },
+      "input_voltage": {
+        "name": "Supply voltage"
+      },
+      "battery_voltage": {
+        "name": "Battery voltage"
+      }
+    },
+    "binary_sensor": {
+      "feeding": {
+        "name": "Feeding"
+      },
+      "on_battery": {
+        "name": "Running on battery"
+      }
+    },
+    "update": {
+      "firmware_update": {
+        "name": "Firmware"
+      }
+    }
+  },
+  "services": {
+    "start_scene": {
+      "name": "Start scene",
+      "description": "Runs one of the pump's scenes, such as Feed Mode or All Off.",
+      "fields": {
+        "device_id": {
+          "name": "Pump",
+          "description": "The pump."
+        },
+        "scene": {
+          "name": "Scene",
+          "description": "Scene name as shown in the Mobius app, or its number."
+        },
+        "minutes": {
+          "name": "Minutes",
+          "description": "How long it runs. Leave empty for the scene's own time."
+        }
+      }
+    },
+    "resume_schedule": {
+      "name": "Back to schedule",
+      "description": "Ends any running scene so the pump follows its schedule.",
+      "fields": {
+        "device_id": {
+          "name": "Pump",
+          "description": "The pump."
+        }
+      }
+    },
+    "get_schedule": {
+      "name": "Get schedule",
+      "description": "Returns the pump's schedule (each block's start time, wave mode and settings).",
+      "fields": {
+        "device_id": {
+          "name": "Pump",
+          "description": "The pump."
+        }
+      }
+    },
+    "set_schedule": {
+      "name": "Set schedule",
+      "description": "Writes a whole schedule, in the same form Get schedule returns.",
+      "fields": {
+        "device_id": {
+          "name": "Pump",
+          "description": "The pump."
+        },
+        "schedule": {
+          "name": "Schedule",
+          "description": "List of blocks: time_minutes, flags, mode and params."
+        }
+      }
+    },
+    "set_wave": {
+      "name": "Set wave",
+      "description": "Sets the wave mode, speed and timing of the schedule block running now.",
+      "fields": {
+        "device_id": {
+          "name": "Pump",
+          "description": "The pump."
+        },
+        "mode": {
+          "name": "Wave mode",
+          "description": "Wave mode."
+        },
+        "speed": {
+          "name": "Speed",
+          "description": "Top speed in percent."
+        },
+        "pulse_ms": {
+          "name": "Pulse time",
+          "description": "Short pulse: pulse length in milliseconds."
+        },
+        "gyre_seconds": {
+          "name": "Gyre time",
+          "description": "Gyre: seconds before the direction changes."
+        },
+        "start_ms": {
+          "name": "Start pulse",
+          "description": "Expanding pulse: first pulse in milliseconds."
+        },
+        "end_ms": {
+          "name": "End pulse",
+          "description": "Expanding pulse: last pulse in milliseconds."
+        }
+      }
+    }
+  }
+}
