@@ -1,0 +1,150 @@
+{
+  "entity": {
+    "switch": {
+      "pump": {
+        "default": "mdi:pump",
+        "state": {
+          "off": "mdi:pump-off"
+        }
+      },
+      "local_control": {
+        "default": "mdi:gesture-tap-button"
+      }
+    },
+    "number": {
+      "speed": {
+        "default": "mdi:speedometer"
+      },
+      "feed_time": {
+        "default": "mdi:timer-cog-outline"
+      },
+      "battery_backup_speed": {
+        "default": "mdi:battery-arrow-up"
+      }
+    },
+    "select": {
+      "wave_mode": {
+        "default": "mdi:waves"
+      },
+      "scene": {
+        "default": "mdi:play-box-multiple-outline"
+      },
+      "led_auto_dim": {
+        "default": "mdi:led-on"
+      }
+    },
+    "button": {
+      "feed": {
+        "default": "mdi:fish"
+      },
+      "resume_schedule": {
+        "default": "mdi:calendar-sync"
+      },
+      "release_for_app": {
+        "default": "mdi:cellphone-arrow-down"
+      },
+      "reconnect": {
+        "default": "mdi:bluetooth-connect"
+      },
+      "sync_time": {
+        "default": "mdi:clock-check-outline"
+      }
+    },
+    "sensor": {
+      "motor_speed": {
+        "default": "mdi:speedometer"
+      },
+      "flow": {
+        "default": "mdi:waves-arrow-right"
+      },
+      "turnover": {
+        "default": "mdi:rotate-3d-variant"
+      },
+      "operation_mode": {
+        "default": "mdi:waves"
+      },
+      "operation_state": {
+        "default": "mdi:calendar-clock"
+      },
+      "active_scene": {
+        "default": "mdi:play-box-outline"
+      },
+      "scene_time_left": {
+        "default": "mdi:timer-sand"
+      },
+      "error": {
+        "default": "mdi:alert-circle-outline",
+        "state": {
+          "noerror": "mdi:check-circle-outline"
+        }
+      },
+      "run_time": {
+        "default": "mdi:timer-outline"
+      },
+      "off_time": {
+        "default": "mdi:timer-pause-outline"
+      },
+      "water_moved": {
+        "default": "mdi:water"
+      },
+      "feeds": {
+        "default": "mdi:fish"
+      },
+      "last_feed": {
+        "default": "mdi:fish"
+      },
+      "bluetooth_link": {
+        "default": "mdi:bluetooth"
+      },
+      "last_reading": {
+        "default": "mdi:clock-outline"
+      },
+      "clock_drift": {
+        "default": "mdi:clock-alert-outline"
+      },
+      "rated_max_flow": {
+        "default": "mdi:waves-arrow-up"
+      },
+      "firmware": {
+        "default": "mdi:chip"
+      },
+      "pump_readings": {
+        "default": "mdi:format-list-bulleted"
+      },
+      "motor_rpm": {
+        "default": "mdi:rotate-right"
+      }
+    },
+    "binary_sensor": {
+      "feeding": {
+        "default": "mdi:fish-off",
+        "state": {
+          "on": "mdi:fish"
+        }
+      },
+      "on_battery": {
+        "default": "mdi:power-plug",
+        "state": {
+          "on": "mdi:battery"
+        }
+      }
+    }
+  },
+  "services": {
+    "start_scene": {
+      "service": "mdi:play-box-outline"
+    },
+    "resume_schedule": {
+      "service": "mdi:calendar-sync"
+    },
+    "get_schedule": {
+      "service": "mdi:calendar-search"
+    },
+    "set_schedule": {
+      "service": "mdi:calendar-edit"
+    },
+    "set_wave": {
+      "service": "mdi:waves"
+    }
+  }
+}

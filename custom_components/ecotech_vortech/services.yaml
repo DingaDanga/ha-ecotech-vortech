@@ -1,0 +1,99 @@
+start_scene:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: ecotech_vortech
+    scene:
+      required: true
+      example: Feed Mode
+      selector:
+        text:
+    minutes:
+      selector:
+        number:
+          min: 1
+          max: 1092
+          unit_of_measurement: min
+          mode: box
+resume_schedule:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: ecotech_vortech
+get_schedule:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: ecotech_vortech
+set_schedule:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: ecotech_vortech
+    schedule:
+      required: true
+      example: '[{"time_minutes": 0, "flags": 0, "mode": "ConstantSpeed", "params": {"MaxSpeed": 420}}]'
+      selector:
+        object:
+set_wave:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: ecotech_vortech
+    mode:
+      required: true
+      selector:
+        select:
+          options:
+            - ConstantSpeed
+            - ReefCrest
+            - Lagoon
+            - NutrientTransport
+            - TidalSwell
+            - ShortPulse
+            - Gyre
+            - ExpandingPulse
+    speed:
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+    pulse_ms:
+      selector:
+        number:
+          min: 250
+          max: 2000
+          step: 10
+          unit_of_measurement: ms
+    gyre_seconds:
+      selector:
+        number:
+          min: 2
+          max: 3600
+          unit_of_measurement: s
+    start_ms:
+      selector:
+        number:
+          min: 250
+          max: 2000
+          step: 50
+          unit_of_measurement: ms
+    end_ms:
+      selector:
+        number:
+          min: 250
+          max: 2000
+          step: 50
+          unit_of_measurement: ms
