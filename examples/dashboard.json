@@ -1,0 +1,433 @@
+{
+  "title": "Wavemaker",
+  "views": [
+    {
+      "title": "Wavemaker",
+      "path": "wavemaker",
+      "icon": "mdi:waves",
+      "type": "sections",
+      "max_columns": 4,
+      "sections": [
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Controls",
+              "icon": "mdi:pump"
+            },
+            {
+              "type": "tile",
+              "entity": "switch.cichlid_wavemaker_pump",
+              "name": "Pump",
+              "vertical": false,
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "button.cichlid_wavemaker_feed",
+              "name": "Feed",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "number.cichlid_wavemaker_speed",
+              "name": "Speed",
+              "features": [
+                {
+                  "type": "numeric-input",
+                  "style": "slider"
+                }
+              ],
+              "grid_options": {
+                "columns": 12
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "select.cichlid_wavemaker_wave_mode",
+              "name": "Wave mode",
+              "features": [
+                {
+                  "type": "select-options"
+                }
+              ],
+              "grid_options": {
+                "columns": 12
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "select.cichlid_wavemaker_scene",
+              "name": "Scene",
+              "features": [
+                {
+                  "type": "select-options"
+                }
+              ],
+              "grid_options": {
+                "columns": 12
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_scene_time_left",
+              "name": "Back to schedule in",
+              "grid_options": {
+                "columns": 12
+              },
+              "visibility": [
+                {
+                  "condition": "state",
+                  "entity": "sensor.cichlid_wavemaker_scene_time_left",
+                  "state_not": "unknown"
+                }
+              ]
+            },
+            {
+              "type": "tile",
+              "entity": "number.cichlid_wavemaker_feed_time",
+              "name": "Feed time",
+              "grid_options": {
+                "columns": 12
+              }
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Right now",
+              "icon": "mdi:waves-arrow-right"
+            },
+            {
+              "type": "gauge",
+              "entity": "sensor.cichlid_wavemaker_motor_speed",
+              "name": "Speed",
+              "min": 0,
+              "max": 100,
+              "needle": true,
+              "grid_options": {
+                "columns": 4
+              }
+            },
+            {
+              "type": "gauge",
+              "entity": "sensor.cichlid_wavemaker_flow",
+              "name": "Flow",
+              "min": 0,
+              "max": 19000,
+              "needle": true,
+              "grid_options": {
+                "columns": 4
+              }
+            },
+            {
+              "type": "gauge",
+              "entity": "sensor.cichlid_wavemaker_motor_power",
+              "name": "Power",
+              "min": 0,
+              "max": 40,
+              "needle": true,
+              "grid_options": {
+                "columns": 4
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_motor_temperature",
+              "name": "Motor",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_driver_temperature",
+              "name": "Driver",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_motor_rpm",
+              "name": "RPM",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_running_mode",
+              "name": "Running mode",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_active_scene",
+              "name": "Active scene",
+              "grid_options": {
+                "columns": 12
+              }
+            },
+            {
+              "type": "history-graph",
+              "title": "Last 24 hours",
+              "hours_to_show": 24,
+              "entities": [
+                {
+                  "entity": "sensor.cichlid_wavemaker_motor_speed",
+                  "name": "Speed"
+                },
+                {
+                  "entity": "switch.cichlid_wavemaker_pump",
+                  "name": "Pump"
+                },
+                {
+                  "entity": "binary_sensor.cichlid_wavemaker_feeding",
+                  "name": "Feeding"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "column_span": 2,
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Statistics",
+              "icon": "mdi:chart-bar"
+            },
+            {
+              "type": "statistics-graph",
+              "title": "Flow (daily average, highest and lowest)",
+              "entities": [
+                {
+                  "entity": "sensor.cichlid_wavemaker_flow",
+                  "name": "Flow"
+                }
+              ],
+              "stat_types": [
+                "mean",
+                "min",
+                "max"
+              ],
+              "period": "day",
+              "days_to_show": 14,
+              "chart_type": "line"
+            },
+            {
+              "type": "statistics-graph",
+              "title": "Running and paused time per day",
+              "entities": [
+                {
+                  "entity": "sensor.cichlid_wavemaker_running_time",
+                  "name": "Running"
+                },
+                {
+                  "entity": "sensor.cichlid_wavemaker_paused_time",
+                  "name": "Paused"
+                }
+              ],
+              "stat_types": [
+                "change"
+              ],
+              "period": "day",
+              "days_to_show": 14,
+              "chart_type": "bar"
+            },
+            {
+              "type": "statistics-graph",
+              "title": "Energy per day",
+              "entities": [
+                {
+                  "entity": "sensor.cichlid_wavemaker_energy",
+                  "name": "Energy"
+                }
+              ],
+              "stat_types": [
+                "change"
+              ],
+              "period": "day",
+              "days_to_show": 30,
+              "chart_type": "bar",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "statistics-graph",
+              "title": "Water moved per day",
+              "entities": [
+                {
+                  "entity": "sensor.cichlid_wavemaker_water_moved",
+                  "name": "Water moved"
+                }
+              ],
+              "stat_types": [
+                "change"
+              ],
+              "period": "day",
+              "days_to_show": 30,
+              "chart_type": "bar",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "statistics-graph",
+              "title": "Feeds per day",
+              "entities": [
+                {
+                  "entity": "sensor.cichlid_wavemaker_feeds",
+                  "name": "Feeds"
+                }
+              ],
+              "stat_types": [
+                "change"
+              ],
+              "period": "day",
+              "days_to_show": 30,
+              "chart_type": "bar",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "statistics-graph",
+              "title": "Temperatures (daily highest)",
+              "entities": [
+                {
+                  "entity": "sensor.cichlid_wavemaker_motor_temperature",
+                  "name": "Motor"
+                },
+                {
+                  "entity": "sensor.cichlid_wavemaker_driver_temperature",
+                  "name": "Driver"
+                }
+              ],
+              "stat_types": [
+                "max"
+              ],
+              "period": "day",
+              "days_to_show": 30,
+              "chart_type": "line",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_last_feed",
+              "name": "Last feed",
+              "grid_options": {
+                "columns": 12
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_feeds",
+              "name": "Feeds (all time)",
+              "grid_options": {
+                "columns": 12
+              }
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "type": "heading",
+              "heading": "Health and connection",
+              "icon": "mdi:heart-pulse"
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_fault",
+              "name": "Fault",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "binary_sensor.cichlid_wavemaker_running_on_battery",
+              "name": "On battery",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_bluetooth_link",
+              "name": "Bluetooth",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_signal_strength",
+              "name": "Signal",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "button.cichlid_wavemaker_hand_over_to_mobius_app",
+              "name": "Hand over to Mobius app",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "button.cichlid_wavemaker_reconnect_now",
+              "name": "Reconnect now",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_pump_clock_difference",
+              "name": "Clock difference",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.cichlid_wavemaker_supply_voltage",
+              "name": "Supply voltage",
+              "grid_options": {
+                "columns": 6
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "update.cichlid_wavemaker_firmware",
+              "name": "Firmware",
+              "grid_options": {
+                "columns": 12
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
