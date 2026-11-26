@@ -30,6 +30,10 @@ class PumpNotFound(ConnectionError):
     """Home Assistant has no connectable Bluetooth path to the pump."""
 
 
+class PumpSignalWeak(ConnectionError):
+    """The only Bluetooth path to the pump is too weak to hold a connection."""
+
+
 class PumpReleased(ConnectionError):
     """The link has been handed to the Mobius app for a while."""
 
@@ -57,6 +61,11 @@ class _HassMobiusDevice(MobiusDevice):
         self.address = ble_device.address
         info = bluetooth.async_last_service_info(self._link.hass, self.address, connectable=True)
         if info is not None:
+            if info.rssi is not None and info.rssi < self._link.min_rssi:
+                raise PumpSignalWeak(
+                    f"best Bluetooth path to {self.address} is {info.rssi} dBm via {info.source}, "
+                    f"below the {self._link.min_rssi} dBm minimum"
+                )
             # The pump stops advertising while connected, so this is the last
             # signal reading of the path the connection uses.
             self._link.connect_rssi = info.rssi
@@ -103,6 +112,7 @@ class PumpLink:
         self.last_error: str | None = None
         self.connect_rssi: int | None = None
         self.connect_source: str | None = None
+        self.min_rssi: int = -100
 
     # ---- state -------------------------------------------------------------
 

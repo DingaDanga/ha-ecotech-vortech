@@ -12,9 +12,9 @@ from mobius import pump_schedule_to_dict
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
 
-from . import VorTechConfigEntry
+from . import VorTechConfigEntry, proxy
 
-TO_REDACT = {"address", "serial", "mac_address", "serial_number", "unique_id", "title"}
+TO_REDACT = {"address", "serial", "mac_address", "serial_number", "unique_id", "title", "connect_source", "source"}
 
 
 def _plain(value: Any) -> Any:
@@ -44,6 +44,12 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: VorTech
                 "connections_made": coordinator.link.connect_count,
                 "last_error": coordinator.link.last_error,
                 "rssi": coordinator.rssi,
+                "connect_rssi": coordinator.link.connect_rssi,
+                "connect_source": coordinator.link.connect_source,
+                "min_rssi": coordinator.link.min_rssi,
+                "proxy_frees": coordinator.proxy_frees,
+                "proxy_last_action": coordinator.proxy_last_action,
+                "proxies": proxy.describe(hass, coordinator.link.connect_source, coordinator.link.address),
             },
             "statistics": dict(coordinator.stats),
             "device_info": _plain(poll.device_info) if poll else None,

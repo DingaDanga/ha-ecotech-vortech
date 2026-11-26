@@ -21,6 +21,8 @@ CONF_APP_RELEASE_MINUTES = "app_release_minutes"
 CONF_TANK_VOLUME = "tank_volume"
 CONF_TIME_SYNC = "time_sync"
 CONF_FIRMWARE_CHECK = "firmware_check"
+CONF_MIN_RSSI = "min_rssi"
+CONF_FREE_PROXY = "free_stuck_proxy"
 
 DEFAULT_POLL_INTERVAL = 30
 DEFAULT_KEEP_CONNECTED = True
@@ -31,6 +33,18 @@ DEFAULT_APP_RELEASE_MINUTES = 15
 DEFAULT_TANK_VOLUME = 0
 DEFAULT_TIME_SYNC = True
 DEFAULT_FIRMWARE_CHECK = True
+# Weakest Bluetooth path the integration will connect through. A far adapter
+# that only just hears the pump makes a link that fails within minutes.
+DEFAULT_MIN_RSSI = -80
+MIN_RSSI_OFF = -100
+DEFAULT_FREE_PROXY = True
+
+# A proxy holding a dead connection keeps the pump silent. After this long
+# without the pump the proxy is asked to let go, then reloaded if it still
+# holds the pump, then left alone for the cool-down.
+PROXY_STUCK_SECONDS = 90
+PROXY_RELOAD_AFTER_SECONDS = 60
+PROXY_COOLDOWN_SECONDS = 600
 
 DEFAULT_FEED_MINUTES = 10
 

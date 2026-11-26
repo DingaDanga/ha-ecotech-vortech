@@ -37,25 +37,33 @@ from homeassistant.util import dt as dt_util
 from .const import (
     CONF_APP_RELEASE_MINUTES,
     CONF_FIRMWARE_CHECK,
+    CONF_FREE_PROXY,
     CONF_KEEP_CONNECTED,
+    CONF_MIN_RSSI,
     CONF_OFF_HOLD_MINUTES,
     CONF_POLL_INTERVAL,
     CONF_TIME_SYNC,
     DEFAULT_APP_RELEASE_MINUTES,
     DEFAULT_FEED_MINUTES,
     DEFAULT_FIRMWARE_CHECK,
+    DEFAULT_FREE_PROXY,
     DEFAULT_KEEP_CONNECTED,
+    DEFAULT_MIN_RSSI,
     DEFAULT_OFF_HOLD_MINUTES,
     DEFAULT_POLL_INTERVAL,
     DEFAULT_TIME_SYNC,
     DOMAIN,
     FIRMWARE_CHECK_INTERVAL_SECONDS,
     MAX_SCENE_MINUTES,
+    PROXY_COOLDOWN_SECONDS,
+    PROXY_RELOAD_AFTER_SECONDS,
+    PROXY_STUCK_SECONDS,
     STATIC_REFRESH_SECONDS,
     TIME_SYNC_INTERVAL_SECONDS,
     TIME_SYNC_MAX_DRIFT_SECONDS,
 )
-from .pump import PumpLink, PumpReleased
+from . import proxy
+from .pump import PumpLink, PumpReleased, PumpSignalWeak
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -251,6 +259,14 @@ class VorTechCoordinator(DataUpdateCoordinator[PumpData]):
         )
         self.link = link
         link.keep_connected = entry.options.get(CONF_KEEP_CONNECTED, DEFAULT_KEEP_CONNECTED)
+        link.min_rssi = int(entry.options.get(CONF_MIN_RSSI, DEFAULT_MIN_RSSI))
+        # Stuck-proxy recovery: when the pump was last reachable, and what has
+        # been tried since it went missing.
+        self._down_since: float | None = None
+        self._proxy_asked_at: float | None = None
+        self._proxy_reloaded_at: float | None = None
+        self.proxy_frees = 0
+        self.proxy_last_action: str | None = None
         self.cache = ConfigurationCache(static_refresh_interval=STATIC_REFRESH_SECONDS)
         self._primitive: PrimitiveType | None = None
         self._model = None
@@ -324,13 +340,75 @@ class VorTechCoordinator(DataUpdateCoordinator[PumpData]):
         except Exception as err:  # noqa: BLE001 - any Bluetooth/protocol failure
             self._failures += 1
             _LOGGER.debug("Poll failed (%d in a row): %s", self._failures, err)
+            if not isinstance(err, PumpSignalWeak):
+                await self._maybe_free_proxy()
             if self.data is not None and self._failures < FAILURES_BEFORE_UNAVAILABLE:
                 return self.data
             raise UpdateFailed(f"Pump not answering: {err}") from err
         self._failures = 0
+        self._down_since = None
+        self._proxy_asked_at = None
         self._update_stats(data)
         await self._maybe_check_firmware(data)
         return data
+
+    async def _maybe_free_proxy(self) -> None:
+        """Makes a Bluetooth proxy let go of a dead connection to the pump.
+
+        Runs only after the pump has been out of reach for a while: the proxy
+        that last carried the link is asked to disconnect the pump, and if
+        Home Assistant's records still show it holding the pump a minute
+        later, the proxy is reloaded. Then nothing more for the cool-down.
+        """
+        now = time.monotonic()
+        if self._down_since is None:
+            self._down_since = now
+            return
+        if not self.option(CONF_FREE_PROXY, DEFAULT_FREE_PROXY):
+            return
+        if now - self._down_since < PROXY_STUCK_SECONDS or self.link.is_connected:
+            return
+        if self._proxy_reloaded_at is not None and now - self._proxy_reloaded_at < PROXY_COOLDOWN_SECONDS:
+            return
+        address = self.link.address
+        try:
+            found = proxy.proxies(self.hass, self.link.connect_source)
+            if not found:
+                return
+            if self._proxy_asked_at is None:
+                self._proxy_asked_at = now
+                for source, entry in found:
+                    if proxy.holds_address(source, address) is False:
+                        continue
+                    if await proxy.ask_disconnect(entry, address):
+                        self.proxy_frees += 1
+                        self.proxy_last_action = f"asked {entry.title} to disconnect"
+                        _LOGGER.warning(
+                            "%s: out of reach for %d s; asked Bluetooth proxy %s to drop its old connection",
+                            self.link.name, now - self._down_since, entry.title,
+                        )
+                return
+            if now - self._proxy_asked_at < PROXY_RELOAD_AFTER_SECONDS:
+                return
+            for source, entry in found:
+                if proxy.holds_address(source, address) is not True:
+                    continue
+                self._proxy_reloaded_at = now
+                self._proxy_asked_at = None
+                self.proxy_frees += 1
+                self.proxy_last_action = f"reloaded {entry.title}"
+                _LOGGER.warning(
+                    "%s: Bluetooth proxy %s is still holding a dead connection; reloading it",
+                    self.link.name, entry.title,
+                )
+                self.hass.async_create_task(proxy.reload_proxy(self.hass, entry))
+                return
+            # Nothing is holding the pump: it is simply out of reach. Try
+            # again after the cool-down rather than on every reading.
+            self._proxy_reloaded_at = now
+            self._proxy_asked_at = None
+        except Exception:  # noqa: BLE001 - recovery must never break polling
+            _LOGGER.debug("%s: proxy recovery failed", self.link.name, exc_info=True)
 
     async def _poll(self, device: MobiusDevice) -> PumpData:
         if self._supported is None:

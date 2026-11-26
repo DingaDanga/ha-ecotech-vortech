@@ -29,7 +29,9 @@ from .pump import PumpLink
 from .const import (
     CONF_APP_RELEASE_MINUTES,
     CONF_FIRMWARE_CHECK,
+    CONF_FREE_PROXY,
     CONF_KEEP_CONNECTED,
+    CONF_MIN_RSSI,
     CONF_MODEL,
     CONF_OFF_HOLD_MINUTES,
     CONF_POLL_INTERVAL,
@@ -38,7 +40,9 @@ from .const import (
     CONF_TIME_SYNC,
     DEFAULT_APP_RELEASE_MINUTES,
     DEFAULT_FIRMWARE_CHECK,
+    DEFAULT_FREE_PROXY,
     DEFAULT_KEEP_CONNECTED,
+    DEFAULT_MIN_RSSI,
     DEFAULT_OFF_HOLD_MINUTES,
     DEFAULT_POLL_INTERVAL,
     DEFAULT_TANK_VOLUME,
@@ -224,6 +228,16 @@ class VorTechOptionsFlow(OptionsFlow):
                 ),
                 vol.Required(
                     CONF_KEEP_CONNECTED, default=options.get(CONF_KEEP_CONNECTED, DEFAULT_KEEP_CONNECTED)
+                ): selector.BooleanSelector(),
+                vol.Required(
+                    CONF_MIN_RSSI, default=options.get(CONF_MIN_RSSI, DEFAULT_MIN_RSSI)
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=-100, max=-40, step=1, unit_of_measurement="dBm", mode=selector.NumberSelectorMode.BOX
+                    )
+                ),
+                vol.Required(
+                    CONF_FREE_PROXY, default=options.get(CONF_FREE_PROXY, DEFAULT_FREE_PROXY)
                 ): selector.BooleanSelector(),
                 vol.Required(
                     CONF_OFF_HOLD_MINUTES, default=options.get(CONF_OFF_HOLD_MINUTES, DEFAULT_OFF_HOLD_MINUTES)
