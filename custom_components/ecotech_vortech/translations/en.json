@@ -29,6 +29,8 @@
         "data": {
           "poll_interval": "Read the pump every",
           "keep_connected": "Keep the Bluetooth connection open",
+          "min_rssi": "Weakest Bluetooth signal to connect through",
+          "free_stuck_proxy": "Free a Bluetooth proxy that is stuck on the pump",
           "off_hold_minutes": "Pump switch off: back on by itself after",
           "app_release_minutes": "'Hand over to Mobius app' lasts",
           "tank_volume": "Tank volume (for the turnover reading, 0 = off)",
@@ -37,6 +39,8 @@
         },
         "data_description": {
           "keep_connected": "Faster controls. Turn off to connect only for each reading, which leaves gaps for the Mobius app.",
+          "min_rssi": "A far adapter that only just hears the pump makes a link that keeps failing. -80 dBm suits most homes; -100 turns the check off.",
+          "free_stuck_proxy": "After a dropped link an ESPHome Bluetooth proxy can keep the old connection open, which keeps the pump silent. When the pump has been out of reach for 90 seconds the proxy is asked to let go, and reloaded if it still holds the pump.",
           "off_hold_minutes": "A safety net so the pump can't be left off. Most is 1092 minutes (just over 18 hours).",
           "time_sync": "Schedules run on the pump's own clock. Checked every 6 hours and corrected if it is out by more than 30 seconds."
         }
