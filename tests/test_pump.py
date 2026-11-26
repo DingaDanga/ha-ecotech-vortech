@@ -115,9 +115,11 @@ async def test_options_flow(hass, loaded):
     assert result["type"] == "form"
     result = await hass.config_entries.options.async_configure(result["flow_id"], {
         "poll_interval": 60, "keep_connected": True, "off_hold_minutes": 30, "app_release_minutes": 10,
-        "tank_volume": 450, "time_sync": True, "firmware_check": False})
+        "tank_volume": 450, "time_sync": True, "firmware_check": False,
+        "min_rssi": -75, "free_stuck_proxy": True})
     await hass.async_block_till_done()
     assert loaded.options["off_hold_minutes"] == 30
+    assert loaded.runtime_data.link.min_rssi == -75
     assert hass.states.get("sensor.cichlid_wavemaker_tank_turnover") is not None
     print(hass.states.get("sensor.cichlid_wavemaker_tank_turnover"))
 
@@ -161,3 +163,77 @@ async def test_flow_ignores_other_devices(hass):
     info.name = "S45 71C8 LE"
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": "bluetooth"}, data=info)
     assert result["type"] == "abort" and result["reason"] == "not_supported"
+
+
+async def test_weak_path_refused(hass):
+    from types import SimpleNamespace
+    from custom_components.ecotech_vortech.pump import PumpLink, PumpSignalWeak
+    link = PumpLink(hass, "AA:BB:CC:DD:EE:FF", "x")
+    link.min_rssi = -80
+    dev = SimpleNamespace(address="AA:BB:CC:DD:EE:FF")
+    weak = SimpleNamespace(rssi=-87, source="hci0")
+    with patch("custom_components.ecotech_vortech.pump.bluetooth.async_ble_device_from_address", return_value=dev), \
+         patch("custom_components.ecotech_vortech.pump.bluetooth.async_last_service_info", return_value=weak), \
+         patch("custom_components.ecotech_vortech.pump.establish_connection") as establish:
+        with pytest.raises(PumpSignalWeak):
+            await link.device.connect()
+        assert not establish.called
+        assert link.connect_source is None
+
+
+async def test_stuck_proxy_is_freed(hass, loaded):
+    from types import SimpleNamespace
+    from custom_components.ecotech_vortech import coordinator as co
+    coord = loaded.runtime_data
+    proxy_entry = SimpleNamespace(title="Tank proxy", entry_id="p1")
+    calls = {"ask": 0, "reload": 0}
+    clock = {"t": 1000.0}
+
+    async def ask(entry, address):
+        calls["ask"] += 1
+        return True
+
+    async def reload_proxy(h, entry):
+        calls["reload"] += 1
+        return True
+
+    holds = {"v": True}
+    with patch.object(co.proxy, "proxies", return_value=[("SRC", proxy_entry)]), \
+         patch.object(co.proxy, "holds_address", side_effect=lambda s, a: holds["v"]), \
+         patch.object(co.proxy, "ask_disconnect", ask), \
+         patch.object(co.proxy, "reload_proxy", reload_proxy), \
+         patch.object(co.time, "monotonic", side_effect=lambda: clock["t"]):
+        await coord._maybe_free_proxy()          # first failure: only notes the time
+        clock["t"] += 60
+        await coord._maybe_free_proxy()          # not long enough yet
+        assert calls == {"ask": 0, "reload": 0}
+        clock["t"] += 40
+        await coord._maybe_free_proxy()          # 100 s: ask the proxy
+        assert calls == {"ask": 1, "reload": 0}
+        clock["t"] += 30
+        await coord._maybe_free_proxy()          # too soon to reload
+        assert calls["reload"] == 0
+        clock["t"] += 40
+        await coord._maybe_free_proxy()          # still held: reload
+        await hass.async_block_till_done()
+        assert calls == {"ask": 1, "reload": 1}
+        clock["t"] += 120
+        await coord._maybe_free_proxy()          # cool-down
+        assert calls == {"ask": 1, "reload": 1}
+        assert coord.proxy_frees == 2
+
+        # A pump that is simply out of reach never gets its proxy reloaded.
+        coord._down_since = coord._proxy_asked_at = coord._proxy_reloaded_at = None
+        holds["v"] = False
+        calls.update(ask=0, reload=0)
+        for _ in range(6):
+            await coord._maybe_free_proxy()
+            clock["t"] += 100
+        assert calls == {"ask": 0, "reload": 0}
+
+
+async def test_diagnostics_lists_recovery(hass, loaded):
+    from custom_components.ecotech_vortech.diagnostics import async_get_config_entry_diagnostics
+    diag = await async_get_config_entry_diagnostics(hass, loaded)
+    assert diag["link"]["min_rssi"] == -80
+    assert diag["link"]["proxies"] == []
